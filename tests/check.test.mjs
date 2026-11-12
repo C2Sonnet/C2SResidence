@@ -1,0 +1,13 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+const root=path.resolve(import.meta.dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const data=JSON.parse(read('data/project.json'));
+test('project identity',()=>{assert.equal(data.name,'如月レジデンス Online');assert.equal(data.version,`r${JSON.parse(read('package.json')).version}`);assert.equal(data.website,'https://resi.c2s.me/');});
+test('public web root and asset references',()=>{const html=read('public/index.html');assert.ok(html.includes('C2SResidence Online'));assert.ok(html.includes('./css/app.css'));assert.ok(html.includes('./js/main.js'));assert.ok(fs.existsSync(path.join(root,'public/js/main.js')));assert.ok(fs.existsSync(path.join(root,'public/css/app.css')));assert.ok(!fs.existsSync(path.join(root,'site')));});
+test('metadata in public and internal matches',()=>{assert.deepEqual(JSON.parse(read('public/data/project.json')),data);});
+test('local configuration and lock files ignored',()=>{const ig=read('.gitignore');for(const key of ['config/','*.lock','package-lock.json','.user.ini','**/.user.ini'])assert.ok(ig.includes(key));});
+test('publishable directory layout',()=>{for(const name of ['app','database','docs','materials','media','nginx','public','scripts','tools','tests','config.example'])assert.ok(fs.statSync(path.join(root,name)).isDirectory());});
+test('no private data in published assets',()=>{for(const dirname of ['public','data']) for(const f of fs.readdirSync(path.join(root,dirname),{recursive:true,withFileTypes:true})) if(f.isFile()) assert.ok(!/\.(?:csv|pdf|sqlite|db|dump|sql|zip|jpe?g|png)$/i.test(f.name));});

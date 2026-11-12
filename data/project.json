@@ -1,0 +1,9 @@
+{
+  "name": "如月レジデンス Online",
+  "name_en": "C2SResidence Online",
+  "version": "r0.3.7",
+  "website": "https://resi.c2s.me/",
+  "repository": "https://github.com/C2Sonnet/C2SResidence",
+  "publication": "preparation",
+  "model_status": "under_verification"
+}
